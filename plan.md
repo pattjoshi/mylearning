@@ -55,3 +55,36 @@ python-dsa-journey/
     └── important_patterns.md
 
 ```
+
+```
+arrays/
+├── theory.md        # concepts
+├── problems/
+│   ├── two_sum.py
+│   ├── max_subarray.py
+└── notes.md         # tricks + patterns
+```
+
+# 2. For Each DSA Topic
+
+```
+arrays/
+├── theory.md        # concepts
+├── problems/
+│   ├── two_sum.py
+│   ├── max_subarray.py
+└── notes.md         # tricks + patterns
+```
+
+# 3. Daily Practice Structure
+
+```
+# Problem: Two Sum
+# Platform: LeetCode
+# Difficulty: Easy
+# Approach: HashMap
+# Time Complexity: O(n)
+
+def two_sum(nums, target):
+    pass
+```
