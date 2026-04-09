@@ -3,8 +3,9 @@
 ## Goals
 
 - Learn Python from scratch
+- solve 300 logic qus
 - Master Data Structures & Algorithms
-- Solve 300+ problems
+- Solve 300+ problems DSA
 
 ## Progress
 
