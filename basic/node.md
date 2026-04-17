@@ -16,3 +16,9 @@
 - assignment operators ( = , += , -= , /= ,%= , \*\*=)
 - logical operators ( not , and , or)
 - input() bydefault convert in to string , so we manualy type casting it.
+
+
+# string
+## slicing
+-  accessing parts  of a string .
+- 
