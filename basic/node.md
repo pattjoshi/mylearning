@@ -37,3 +37,27 @@
 # Tuples 
 - A built-in data type that lets us create **immutable** sequences of values.
 -  
+
+# Dictionary in py (L4)
+- Dictionaries are used to store data values in **key:value** pairs
+- They are unordered,mutable(changable) **don't allow duplicate keys**
+
+
+# Dictionary Methods
+- myDict.keys() # return all keys
+- myDict.values() # return all values
+- myDict.items() #return all (key,val) pairs as tuples
+- myDict.get("key") # return the key according to value
+- myDict.update(newDict) # inserts the specifed items to the dictiona
+
+# set
+- set in the collection of the **unordered items**,
+- Each element in the set must be **unique & immutable**.
+- list and dict are store in set
+- nums = {1,2,3,4}
+- set.add(el) # add an element
+- set.remove(el) # removes the elem an 
+- set.clear() # empties the set
+- set.pop() # removes a rendom value
+- set.union(set2) # **combines both set values** & return new
+- set.intersection(set2) # **comnines commmon values**  & return new
