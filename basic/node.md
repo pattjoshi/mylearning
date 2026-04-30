@@ -61,3 +61,37 @@
 - set.pop() # removes a rendom value
 - set.union(set2) # **combines both set values** & return new
 - set.intersection(set2) # **comnines commmon values**  & return new
+
+
+# Loops in Python (L5)
+- Loops are used to repeat instructions.
+- wile loop and for loop
+- 
+
+# Brack & continue while loop
+- Break : used to terminate the loop when encountered.
+- continue : terminates execution in the curreent iteration & continues execution of the loop with the next iteration.
+
+
+# For Loop in python 
+- Loop are   used for sequential traversel.For traversing list, string tuples etc.
+
+
+# use case of loops
+## for loop
+- When you know how many times to run the loop
+- When you are looping through a list, tuple, string, etc.
+
+
+## while loop
+- When you don’t know how many times the loop will run
+- When the loop depends on a condition
+
+
+# range()
+
+- range function returns  a qwquence of numbers, strarting from a by default, and increments by 1 (bt default) , and stops before a specified number.
+- range(start ? , stop , step?)
+
+
+
