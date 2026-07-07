@@ -455,7 +455,100 @@ volumes:
 
 ---
 
-## 12. Suggested Build Order (for your 2-3 week window)
+## 12. UI/UX Design System
+
+**Direction:** corporate/professional — but "enterprise learning platform" not "generic dashboard." Think Coursera-for-business or LinkedIn Learning's polish, minus their clutter. This needs to feel credible enough that an instructor trusts it with their course content, and calm enough that a student can focus while learning.
+
+### 12.1 Design Tokens
+
+**Color palette** (deliberately different from Project 1 so the two don't look like siblings):
+| Token | Hex | Use |
+|---|---|---|
+| `--ink-900` | `#14161F` | Primary text |
+| `--slate-500` | `#5B5F73` | Secondary text |
+| `--surface-0` | `#FFFFFF` | Cards |
+| `--surface-50` | `#F6F6F9` | App background |
+| `--border` | `#E4E4EC` | Dividers |
+| `--brand-800` | `#2B2D6E` | Primary actions, nav — deep indigo, reads as "knowledge/institutional" without being generic SaaS purple |
+| `--brand-100` | `#E6E6F7` | Selected states, tinted backgrounds |
+| `--accent-gold` | `#C08A1E` | Achievement/completion signals (certificates, streaks) — used sparingly, earns its "reward" meaning by not being overused elsewhere |
+| `--ai-accent` | `#0E8F82` | Reserved exclusively for AI-generated content indicators (chatbot, AI-generated quiz badge, summary box) — a distinct teal so users always know "this came from AI" at a glance, a genuinely useful UX signal, not decoration |
+| `--success` | `#1E8E5A` | Correct answers, completed lessons |
+| `--danger` | `#C0392B` | Incorrect answers, errors |
+
+The `--ai-accent` token is the deliberate design decision here: every AI-touched surface (chat bubble, AI quiz badge, summary box border) uses this one color consistently, nothing else does. That consistency *is* the signature — it teaches users the visual language of "AI assisted this" without needing a label every time.
+
+**Typography:**
+| Role | Typeface | Notes |
+|---|---|---|
+| Display/Headings | Source Serif 4 (weight 600) | A serif for course titles/marketing pages gives an "editorial/academic" credibility that a sans-only LMS lacks — used only for H1/H2 on public course pages, not inside the app |
+| Body & UI | Inter (weight 400-500) | Inside the actual learning app (dashboard, lesson player, chat) — serif would hurt readability during long reading/study sessions |
+| Code/data | JetBrains Mono | If any technical course content includes code snippets |
+
+This serif/sans split is the one deliberate typographic risk: it signals "this is a place of learning" on public-facing pages (course catalog, landing) while staying purely functional inside the actual product — a genuine, justifiable choice rather than a default pairing.
+
+**Layout concept — public course page (Next.js SSR):**
+```
+┌──────────────────────────────────────────────┐
+│  SkillForge          Courses  Pricing  Log in  │
+├──────────────────────────────────────────────┤
+│                                                 │
+│   [Course thumbnail]   React for Backend Devs  │
+│                        by Priya Sharma          │
+│                        ★ 4.8 (240 students)     │
+│                        [Enroll — Free]          │
+│                                                 │
+│   What you'll learn        Curriculum          │
+│   ─────────────────        ──────────          │
+│   ✓ Component patterns     Module 1: Basics ▸  │
+│   ✓ State management       Module 2: Hooks  ▸  │
+└──────────────────────────────────────────────┘
+```
+
+**Layout concept — learning app (post-enrollment, CSR):**
+```
+┌──────────────────────────────────────────────┐
+│ ← Course   Module 2: State Management    68%  │
+├───────────────┬────────────────────────────────┤
+│  Lesson list   │   [Video Player]                │
+│  ✓ 2.1 Intro   │                                  │
+│  ▶ 2.2 useState │  ┌─ AI Summary ────────────┐   │
+│    2.3 useEffect│  │ • Key point 1             │   │
+│                 │  │ • Key point 2             │   │
+│                 │  └────────────────────────────┘  │
+│                 │  [Ask a question about this...]  │
+└───────────────┴────────────────────────────────┘
+```
+
+**Signature element:** the **AI chat panel with streaming responses** — design it as a persistent, collapsible side panel (not a modal popup) so students can ask questions without losing their place in the lesson. Streamed tokens appear with a subtle, calm fade-in (not a typewriter-cursor cliché), and every AI answer that cites course content shows a small "Referenced: Lesson 2.2" chip below it — a real trust-building UX detail tied directly to how RAG actually works, which is exactly the kind of "structure encodes real information" principle worth leaning on here.
+
+### 12.2 Key Screens
+
+1. **Course catalog** (Next.js SSG/ISR) — server-rendered, SEO-optimized, fast first paint
+2. **Course detail/landing page** (SSR) — curriculum outline, instructor bio, enroll CTA
+3. **Learning player** — lesson list + content pane + collapsible AI chat panel + progress bar
+4. **AI Quiz Generator (instructor view)** — upload/paste content → "Generating quiz..." loading state → editable question list before publish (never auto-publish AI content without instructor review — a real trust/product decision worth stating explicitly)
+5. **Student dashboard** — enrolled courses as cards with progress rings, continue-learning shortcut to exact last position
+6. **Instructor analytics** — completion funnel, quiz score distribution, "most asked chatbot questions" (signals confusing content — a genuinely useful AI-derived insight)
+
+### 12.3 Static/Performance Strategy (this is where Next.js earns its place)
+
+- **Course catalog & course detail pages: SSG with ISR** (revalidate every 60s) — these are public, SEO-relevant, and don't change every second, so pre-render them at build time and revalidate incrementally rather than SSR-on-every-request
+- **Learning app (post-login): CSR** — no SEO need, and it's interactive/stateful (video position, chat), so client-rendering is the right call, not a compromise
+- Use `next/image` for all thumbnails/instructor photos — automatic responsive sizing, lazy loading
+- Stream the AI chat response using the Fetch streaming API / React Server Components streaming rather than waiting for the full response — perceived latency matters far more than actual latency for AI features
+- Lighthouse target: 95+ on the public course catalog/detail pages (this is the legitimate, resume-worthy use of Next.js's SSG — be ready to explain *why* those specific pages are static and the dashboard isn't, since "I used Next.js" alone isn't a good enough interview answer)
+
+### 12.4 Accessibility & Responsive Baseline
+
+- Video player has captions support built into the schema (`videoUrl` can pair with a `captionsUrl` — mention as roadmap if not built)
+- AI chat panel fully keyboard-operable, screen-reader announces new streamed messages via `aria-live="polite"`
+- Quiz options are proper `<fieldset>`/`<radio>` groups, not styled `<div>`s — keyboard and screen-reader correctness matters for an education product specifically
+- Responsive: course catalog and learning player both usable down to 360px width
+
+---
+
+## 13. Suggested Build Order (for your 2-3 week window)
 
 1. Days 1-2: Postgres schema, Prisma + pgvector setup, auth, course/module/lesson CRUD
 2. Days 3-4: Course catalog (Next.js SSR pages), enrollment, learning player with progress tracking
