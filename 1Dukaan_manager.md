@@ -375,7 +375,81 @@ volumes:
 
 ---
 
-## 11. Suggested Build Order (for your 2-3 week window)
+## 11. UI/UX Design System
+
+**Direction:** corporate/professional — this product needs to feel *trustworthy* to a shop owner handing over their business's daily operations to it. Think "banking app meets scheduling tool," not playful startup. Confidence and clarity over decoration.
+
+### 11.1 Design Tokens
+
+**Color palette** (named, not generic defaults):
+| Token | Hex | Use |
+|---|---|---|
+| `--ink-900` | `#0F172A` | Primary text, headers |
+| `--slate-600` | `#475569` | Secondary text |
+| `--surface-0` | `#FFFFFF` | Cards, panels |
+| `--surface-50` | `#F8FAFC` | App background |
+| `--border` | `#E2E8F0` | Dividers, input borders |
+| `--brand-700` | `#0F5B4C` | Primary actions, active nav — a deep, confident teal-green (evokes trust + "money/growth" without being generic fintech blue) |
+| `--brand-100` | `#DCF3EC` | Subtle backgrounds for brand-tinted elements (badges, selected states) |
+| `--accent-amber` | `#B5730A` | Warnings, pending status, "attention needed" |
+| `--success` | `#16794F` | Confirmed bookings, completed states |
+| `--danger` | `#B3261E` | Cancellations, no-shows, destructive actions |
+
+Rationale: avoid the generic "SaaS blue" (#4F46E5-ish) and the AI-cliché terracotta/cream combo. Deep teal-green reads as stable, professional, and money-adjacent — appropriate for a tool managing revenue — without looking like a template.
+
+**Typography:**
+| Role | Typeface | Notes |
+|---|---|---|
+| Display/Headings | Inter (weight 600-700) | Clean, highly legible at small dashboard sizes, excellent Devanagari-adjacent support if you add Hindi later |
+| Body | Inter (weight 400-500) | Same family, different weight — keeps things quiet and consistent for a dashboard-heavy tool |
+| Data/Numbers (revenue, counts) | Inter with `font-variant-numeric: tabular-nums` | Critical for dashboard number columns to align properly — a detail most portfolio projects miss |
+
+For an enterprise tool, resist the urge to pair two display fonts — one disciplined family used well beats a "designed" pairing that fights the data-density of a dashboard.
+
+**Layout concept:**
+```
+┌────────────────────────────────────────────┐
+│ [Logo]  Dashboard  Bookings  Staff  Services │  ← top nav, persistent
+├───────────┬──────────────────────────────────┤
+│           │  Today's Bookings          [+New] │
+│  Sidebar  │  ┌────────┐ ┌────────┐            │
+│  (filters,│  │ 9:00 AM │ │10:30AM │  ...       │
+│  staff    │  │ Rahul   │ │ Priya  │            │
+│  list)    │  └────────┘ └────────┘            │
+│           │                                    │
+│           │  Revenue this week: ₹24,500  ↑12%  │
+└───────────┴────────────────────────────────────┘
+```
+Left sidebar + top nav is the correct, boring, *right* choice here — owners will use this daily, muscle memory matters more than novelty. This is a case where the "signature element" (per design best practice) should NOT be structural navigation — save it for something else.
+
+**Signature element:** the **live booking calendar** itself — build it with a distinctive but restrained visual treatment: staff columns with subtle color-coded avatars, smooth drag-to-reschedule, and a soft real-time "pulse" animation (not a jarring toast) when a new booking comes in via Socket.io. This is the one place worth spending polish budget.
+
+### 11.2 Key Screens (design each of these with real content, not lorem ipsum)
+
+1. **Public booking page** — this is the one screen non-technical people (customers) will judge the whole business on. Must feel instant and simple: service → staff → slot → confirm, 4 taps max on mobile. Large tap targets (min 44px), no unnecessary form fields.
+2. **Owner dashboard (home)** — today's agenda front and center, revenue snapshot, no-show alert banner if any
+3. **Booking calendar (week view)** — staff-columns, color-coded by status (confirmed = brand-700, pending = amber, cancelled = greyed strikethrough)
+4. **Staff management** — simple table + slide-over panel for edit (don't navigate away, use a drawer — keeps context)
+5. **Empty states** — e.g., "No bookings yet today" should say what to do next ("Share your booking link" with a copy button), not just show a blank calendar
+
+### 11.3 Static/Performance Strategy
+
+Even though this is a logged-in dashboard app (CSR-heavy, React + Vite), keep the **public booking page** fast and lightweight since that's what customers hit on mobile data:
+- Public booking page: minimal JS bundle, code-split away from the dashboard bundle entirely (separate route chunk)
+- Lazy-load the calendar/drag-and-drop library only on dashboard routes, never on the public page
+- Serve via CloudFront with aggressive caching on static assets (hashed filenames), short cache on the availability API response
+- Lighthouse target: 90+ performance score on the public booking page specifically — this is a legitimate, checkable metric to put on your resume ("optimized public booking flow to 95+ Lighthouse score on 3G throttling")
+
+### 11.4 Accessibility & Responsive Baseline
+
+- All interactive elements keyboard-navigable, visible focus rings (don't remove `outline` without replacing it)
+- Color is never the only status signal — pair status colors with text labels/icons (colorblind-safe)
+- Public booking page fully responsive down to 360px width (most Indian users are on mid-range Android phones)
+- Respect `prefers-reduced-motion` for the calendar pulse animation
+
+---
+
+## 12. Suggested Build Order (for your 2-3 week window)
 
 1. Days 1-2: Postgres schema + Prisma setup, auth, business/staff/service CRUD
 2. Days 3-4: Availability calculation + booking creation with conflict prevention (the hard part — budget extra time)
