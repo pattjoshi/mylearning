@@ -576,3 +576,8 @@ And remember: the startup that's right for you is the one where you'd learn so f
 ---
 
 *Built from research on startup hiring in 2026 — the best time to be a full stack engineer looking to join something early.*
+
+<img width="432" height="269" alt="image" src="https://github.com/user-attachments/assets/0fac9a5d-2704-46c3-959c-1aeb5f16e350" />
+
+
+
